@@ -1,28 +1,106 @@
 [![Moleculer](https://badgen.net/badge/Powered%20by/Moleculer/0e83cd)](https://moleculer.services)
 
-# bluefox
-This is a [Moleculer](https://moleculer.services/)-based microservices project. Generated with the [Moleculer CLI](https://moleculer.services/docs/0.14/moleculer-cli.html).
+# Bluefox Microservices Project
 
-## Usage
-Start the project with `npm run dev` command. 
-After starting, open the http://localhost:3000/ URL in your browser. 
-On the welcome page you can test the generated services via API Gateway and check the nodes & services.
+Bluefox is a microservices project built with [Moleculer](https://moleculer.services/), focusing on authentication and user management.
 
-In the terminal, try the following commands:
-- `nodes` - List all connected nodes.
-- `actions` - List all registered service actions.
-- `call greeter.hello` - Call the `greeter.hello` action.
-- `call greeter.welcome --name John` - Call the `greeter.welcome` action with the `name` parameter.
-- `call products.list` - List the products (call the `products.list` action).
+## Prerequisites
 
+- Node.js (v16 or higher)
+- npm (v8 or higher)
+- Docker (optional, for containerized deployment)
 
-## Services
-- **api**: API Gateway services
-- **greeter**: Sample service with `hello` and `welcome` actions.
-- **products**: Sample DB service. To use with MongoDB, set `MONGO_URI` environment variables and install MongoDB adapter with `npm i moleculer-db-adapter-mongo`.
+## Project Structure
 
-## Mixins
-- **db.mixin**: Database access mixin for services. Based on [moleculer-db](https://github.com/moleculerjs/moleculer-db#readme)
+- `services/`: Microservices implementations
+- `test/`: Unit and integration tests
+- `helpers/`: Utility functions
+- `graphql/`: GraphQL schema definitions
+- `src/`: Generated TypeScript types
+
+## Setup and Installation
+
+1. Clone the repository
+```bash
+git clone https://github.com/[your-username]/bluefox.git
+cd bluefox
+```
+
+2. Install dependencies
+```bash
+npm install
+```
+
+## Development
+
+### Running the Project
+
+- Development mode (with hot-reload):
+```bash
+npm run dev
+```
+
+- Production mode:
+```bash
+npm start
+```
+
+### Running Tests
+
+- Run all tests:
+```bash
+npm test
+```
+
+- Run specific test suite:
+```bash
+npm test test/unit/services/auth.methods.spec.ts
+```
+
+### Available npm Scripts
+
+- `dev`: Start project in development mode
+- `start`: Start project in production mode
+- `test`: Run Jest test suite
+- `build`: Compile TypeScript to JavaScript
+
+## Configuration
+
+- `moleculer.config.js`: Moleculer broker configuration
+- `tsconfig.json`: TypeScript compiler settings
+- `jest.config.js`: Jest testing framework configuration
+
+## Authentication Services
+
+The project includes robust authentication methods:
+- Account registration
+- Practice account registration
+- Password change
+- Two-factor authentication helpers
+
+## GraphQL Integration
+
+Uses GraphQL for API interactions, with schema defined in `graphql/schema.graphql`
+
+## Docker Support
+
+A `Dockerfile` and `docker-compose.yml` are provided for containerized deployment.
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## License
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
+## Contact
+
+Project Link: https://github.com/[your-username]/bluefox
 
 
 ## Useful links

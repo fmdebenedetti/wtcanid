@@ -1,0 +1,30 @@
+scalar uuid
+scalar timestamptz
+
+enum UserRole {
+  ADMIN
+  USER
+  GUEST
+}
+
+type Account {
+  id: uuid!
+  email: String!
+  firstName: String
+  lastName: String
+  role: UserRole!
+  isActive: Boolean!
+  createdAt: timestamptz!
+  lastLogin: timestamptz
+}
+
+type Query {
+  accounts_by_pk(id: uuid!): Account
+  accounts(where: AccountFilter): [Account!]!
+}
+
+input AccountFilter {
+  email: String
+  role: UserRole
+  isActive: Boolean
+}

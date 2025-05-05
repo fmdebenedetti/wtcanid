@@ -1,0 +1,63 @@
+{
+  "name": "bluefox",
+  "version": "1.0.0",
+  "description": "My Moleculer-based microservices project",
+  "scripts": {
+    "dev": "ts-node-dev --respawn --transpile-only -P tsconfig.moleculer.json node_modules/moleculer/bin/moleculer-runner.js --env --repl --hot services/**/*.service.ts",
+    "start": "moleculer-runner --env",
+    "cli": "moleculer connect NATS",
+    "ci": "jest --watch",
+    "test": "jest --coverage",
+    "lint": "eslint services",
+    "dc:up": "docker-compose up --build -d",
+    "dc:logs": "docker-compose logs -f",
+    "dc:down": "docker-compose down"
+  },
+  "keywords": [
+    "microservices",
+    "moleculer"
+  ],
+  "author": "",
+  "devDependencies": {
+    "@graphql-codegen/cli": "^5.0.5",
+    "@graphql-codegen/typescript": "^4.1.6",
+    "@graphql-codegen/typescript-resolvers": "^4.5.0",
+    "@types/bcrypt": "^5.0.2",
+    "@types/ioredis": "^4.28.10",
+    "@types/jest": "^29.5.14",
+    "@types/jsonwebtoken": "^9.0.9",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^22.15.3",
+    "eslint": "^8.25.0",
+    "jest": "^29.7.0",
+    "jest-cli": "^27.5.1",
+    "jest-mock": "^29.7.0",
+    "moleculer-cli": "^0.8.1",
+    "moleculer-repl": "^0.7.3",
+    "ts-jest": "^29.3.2",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "@nestjs/common": "^11.1.0",
+    "@types/express": "^5.0.1",
+    "bcrypt": "^5.1.1",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "graphql-request": "^7.1.2",
+    "http-proxy-middleware": "^3.0.5",
+    "ioredis": "^5.6.1",
+    "jsonwebtoken": "^9.0.2",
+    "moleculer": "^0.14.35",
+    "moleculer-db": "^0.8.20",
+    "moleculer-db-adapter-mongo": "^0.4.15",
+    "moleculer-web": "^0.10.4",
+    "nats": "^2.7.1",
+    "winston": "^3.17.0"
+  },
+  "engines": {
+    "node": ">= 16.x.x"
+  }
+}

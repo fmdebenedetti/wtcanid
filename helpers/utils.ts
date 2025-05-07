@@ -10,13 +10,28 @@ const EXPIRATION_TIME = 60 * 1000;
 
 const codes: TwoFACode[] = [];
 
-export function generate2FACode(accountId: string): TwoFACode {
-  // Limpiar códigos expirados
+// Función para limpiar códigos expirados
+function cleanExpiredCodes() {
   const now = Date.now();
-  const validCodes = codes.filter(c => now <= c.expiresAt);
+  const initialLength = codes.length;
+  codes.splice(0, codes.length, ...codes.filter(c => now <= c.expiresAt));
+  
+  if (initialLength !== codes.length) {
+    Logger.info(`Limpiados ${initialLength - codes.length} códigos 2FA expirados`);
+  }
+}
+
+// Limpiar códigos cada 5 minutos
+setInterval(cleanExpiredCodes, 5 * 60 * 1000);
+
+export function generate2FACode(accountId: string): TwoFACode {
+  // Limpiar códigos expirados antes de generar
+  cleanExpiredCodes();
+  
+  const now = Date.now();
   
   // Verificar si ya existe un código válido para esta cuenta
-  const existingCode = validCodes.find(c => c.accountId === accountId);
+  const existingCode = codes.find(c => c.accountId === accountId && now <= c.expiresAt);
   if (existingCode) {
     Logger.warn(`Código 2FA ya existe para cuenta: ${accountId}`);
     return existingCode;

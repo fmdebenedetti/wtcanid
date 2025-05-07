@@ -1,12 +1,7 @@
 /** @type {import('ts-jest').JestConfigWithTsJest} */
 module.exports = {
-  testEnvironment: 'jsdom',
-  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
-  moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/$1'
-  },
-  preset: 'ts-jest',
   testEnvironment: 'node',
+  preset: 'ts-jest',
   roots: ['<rootDir>/test', '<rootDir>/services'],
   transform: {
     '^.+\\.tsx?$': ['ts-jest', {
@@ -14,11 +9,10 @@ module.exports = {
       useESM: true
     }]
   },
-  setupFiles: ['<rootDir>/jest.setup.js'],
+  extensionsToTreatAsEsm: ['.ts'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/$1',
-    '^graphql-request$': '<rootDir>/node_modules/graphql-request/build/index.js'
+    '^@/(.*)$': '<rootDir>/$1'
   },
   testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.[jt]sx?$',
   coverageDirectory: './coverage',
@@ -29,7 +23,6 @@ module.exports = {
   transformIgnorePatterns: [
     'node_modules/(?!graphql-request)/'
   ],
-  extensionsToTreatAsEsm: ['.ts'],
   globals: {
     'ts-jest': {
       useESM: true,

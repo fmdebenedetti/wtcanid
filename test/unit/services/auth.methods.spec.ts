@@ -1,4 +1,4 @@
-import authMethods from '../../../services/auth/auth.methods.js';
+import authMethods from '../../../services/auth/auth.methods';
 // @ts-ignore
 import bcrypt from 'bcrypt';
 
@@ -13,12 +13,13 @@ type GraphQLResponse = {
   insert_practice_accounts_one?: { id: string };
 };
 
-const mockRequest = jest.fn<Promise<GraphQLResponse>, [{ query: string, variables: Record<string, unknown> }]>();
+const mockRequest = jest.fn<Promise<GraphQLResponse>, [{ query: string, variables: Record<string, unknown> }]>().mockImplementation(() => Promise.resolve({}));
 
 jest.mock('graphql-request', () => ({
-  GraphQLClient: jest.fn(() => ({
+  GraphQLClient: jest.fn().mockImplementation(() => ({
     request: mockRequest
-  }))
+  })),
+  gql: jest.fn()
 }));
 
 describe('authMethods', () => {

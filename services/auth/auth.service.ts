@@ -41,7 +41,6 @@ const authService = {
       async handler(ctx: Context<Validate2FAParams>): Promise<TokenResponse | ErrorResponse> {
         const { accountId, code } = ctx.params;
     
-        // Validar código 2FA solo en memoria
         const result = validate2FACode(accountId, code);
     
         switch (result.status) {
@@ -98,6 +97,18 @@ const authService = {
 
         await authMethods.changePassword(accountId, password);
         return { responseCode: 200 };
+      }
+    },
+    encrypt: {
+      async handler(ctx: Context<{ password: string }>): Promise<string> {
+        const { password } = ctx.params;
+        return authMethods.hashPassword(password);
+      }
+    },
+    verifyToken: {
+      async handler(ctx: Context<{ token: string }>): Promise<any> {
+        const { token } = ctx.params;
+        return authMethods.verify(token);
       }
     }
   }

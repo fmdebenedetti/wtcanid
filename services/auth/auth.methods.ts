@@ -2,11 +2,13 @@ import bcrypt from "bcrypt";
 import { GraphQLClient } from "graphql-request";
 import Logger from '../../helpers/logger';
 import { UUID } from "node:crypto";
+import jwt from "jsonwebtoken";
 import { AccountResponse, GraphQLAccountResponse, PracticeAccountResponse } from '../../helpers/types';
 import { ACCOUNT_QUERY_BY_EMAIL, ACCOUNT_QUERY_BY_ID, ACCOUNT_BY_PRACTICE_ACCOUNT, ASSOCIATE_PRACTICE_ACCOUNT_MUTATION, REGISTER_ACCOUNT_MUTATION, REGISTER_PRACTICE_ACCOUNT_MUTATION, UPDATE_ACCOUNT_PASSWORD_MUTATION, PRACTICE_BY_HANDLER } from '../../helpers/gql-querys';
 
 const HASURA_GRAPHQL_ENDPOINT = process.env.HASURA_GRAPHQL_ENDPOINT || 'http://localhost:8080/v1/graphql';
 const HASURA_GRAPHQL_ADMIN_SECRET = process.env.HASURA_GRAPHQL_ADMIN_SECRET || 'FdEezvp4EQtgjq4aLUt3rsEzJF4cbbN5';
+const JWT_SECRET = process.env.JWT_SECRET || 'B7wNrW1gfJ9pLvtkGYirtGJQrLNt6zbA';
 
 const client = new GraphQLClient(HASURA_GRAPHQL_ENDPOINT, {
   headers: {
@@ -112,6 +114,9 @@ const authMethods = {
     return client.request(PRACTICE_BY_HANDLER, { handler });
   },
 
+  async verify(token: string) : Promise<any> {
+    return jwt.verify(token, JWT_SECRET);
+  }
 };
 
 export default authMethods;

@@ -1,4 +1,3 @@
-// Utilidades para 2FA
 import Logger from './logger';
 import jwt from "jsonwebtoken";
 import { TwoFACode, Validate2FAResult, JWTPayload, AccountResponse } from './types';
@@ -21,8 +20,8 @@ function cleanExpiredCodes() {
   }
 }
 
-// Limpiar códigos cada 5 minutos
-setInterval(cleanExpiredCodes, 5 * 60 * 1000);
+// Limpiar códigos cada 1 minuto
+setInterval(cleanExpiredCodes, 1 * 60 * 1000);
 
 export function generate2FACode(accountId: string): TwoFACode {
   // Limpiar códigos expirados antes de generar
@@ -37,7 +36,7 @@ export function generate2FACode(accountId: string): TwoFACode {
     return existingCode;
   }
   
-  const code = Math.floor(100000 + Math.random() * 900000).toString(); // 6 dígitos
+  const code = Math.floor(100000 + Math.random() * 900000).toString();
   const expiresAt = now + EXPIRATION_TIME;
   const twoFACode: TwoFACode = { 
     code, 

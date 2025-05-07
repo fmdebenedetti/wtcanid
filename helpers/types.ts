@@ -67,3 +67,9 @@ export interface GraphQLAccountResponse {
     suspended: boolean;
   }[];
 }
+
+export interface PracticeAccountResponse {
+  practiceAccount: {
+    accountId: string;
+  };
+}

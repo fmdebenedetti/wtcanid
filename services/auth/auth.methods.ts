@@ -1,43 +1,11 @@
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 import { GraphQLClient, gql } from "graphql-request";
 import Logger from '../../helpers/logger';
-import { Account, UserRole } from '../../src/generated/graphql';
+import { UUID } from "node:crypto";
+import { AccountResponse, GraphQLAccountResponse } from '../../helpers/types';
 
 const HASURA_GRAPHQL_ENDPOINT = process.env.HASURA_GRAPHQL_ENDPOINT || 'http://localhost:8080/v1/graphql';
 const HASURA_GRAPHQL_ADMIN_SECRET = process.env.HASURA_GRAPHQL_ADMIN_SECRET || 'FdEezvp4EQtgjq4aLUt3rsEzJF4cbbN5';
-const JWT_SECRET = process.env.JWT_SECRET || 'B7wNrW1gfJ9pLvtkGYirtGJQrLNt6zbA';
-
-// Interfaz para el payload del JWT
-interface JWTPayload {
-  sub: string;
-  email: string;
-  role: UserRole;
-  firstName?: string;
-  lastName?: string;
-}
-
-// Consulta GraphQL para obtener la cuenta por email
-// Tipo para la respuesta de GraphQL
-interface GraphQLAccountResponse {
-  practice_accounts: {
-    account: {
-      id: string;
-      password: string;
-      firstName: string;
-      lastName: string;
-      npi: string;
-    }
-  }[];
-}
-
-interface AccountResponse {
-  id: string;
-  password: string;
-  firstName: string;
-  lastName: string;
-  npi: string;
-}
 
 const ACCOUNT_QUERY = gql`
   query GetAccount($email: String!) {
@@ -52,6 +20,31 @@ const ACCOUNT_QUERY = gql`
         firstName
         lastName
         npi
+        email
+      }
+      practice {
+        id
+        handler
+      }
+      suspended
+    }
+  }
+`;
+
+const ACCOUNT_QUERY_BY_ID = gql`
+  query GetAccount($accountId: uuid!) {
+    practice_accounts(
+      where: {
+        account: { id: { _eq: $accountId } }
+      }
+    ) {
+      account {
+        id
+        password
+        firstName
+        lastName
+        npi
+        email
       }
     }
   }
@@ -75,6 +68,10 @@ const authMethods = {
       
       if (!data.practice_accounts || data.practice_accounts.length === 0) {
         throw new Error('Cuenta no encontrada');
+      }
+
+      if (data.practice_accounts[0].suspended) {
+        throw new Error('Cuenta suspendida');
       }
 
       const account = data.practice_accounts[0].account;
@@ -106,9 +103,34 @@ const authMethods = {
         throw new Error('Cuenta no encontrada');
       }
 
+      if (data.practice_accounts[0].suspended) {
+        throw new Error('Cuenta suspendida');
+      }
+
       const account = data.practice_accounts[0].account;
 
       return account;
+    } catch (error) {
+      Logger.error(`Error en login: ${error instanceof Error ? error.message : String(error)}`);
+      throw error;
+    }
+  },
+
+  async getAccountById(accountId: UUID) : Promise<AccountResponse>{
+    const client = new GraphQLClient(HASURA_GRAPHQL_ENDPOINT, {
+      headers: {
+        'x-hasura-admin-secret': HASURA_GRAPHQL_ADMIN_SECRET
+      }
+    });
+
+    try {
+      const data = await client.request<GraphQLAccountResponse>(ACCOUNT_QUERY_BY_ID, { accountId });
+      
+      if (!data.practice_accounts || data.practice_accounts.length === 0) {
+        throw new Error('Cuenta no encontrada');
+      }
+      
+      return data.practice_accounts[0].account;
     } catch (error) {
       Logger.error(`Error en login: ${error instanceof Error ? error.message : String(error)}`);
       throw error;
@@ -218,31 +240,3 @@ const authMethods = {
 };
 
 export default authMethods;
-
-export async function generateJwtToken(account: Account): Promise<string> {
-  Logger.info(`Generando JWT para cuenta: ${account.email}`);
-  
-  if (!account.isActive) {
-    throw new Error('Cuenta inactiva');
-  }
-
-  const payload: JWTPayload = {
-    sub: account.id,
-    email: account.email,
-    role: account.role,
-    firstName: account.firstName || undefined,
-    lastName: account.lastName || undefined
-  };
-
-  try {
-    const token = jwt.sign(payload, JWT_SECRET, {
-      expiresIn: '1h', // Token válido por 1 hora
-      algorithm: 'HS256'
-    });
-
-    return token;
-  } catch (error) {
-    Logger.error(`Error generando JWT: ${error instanceof Error ? error.message : String(error)}`);
-    throw new Error('Error generando token de autenticación');
-  }
-}

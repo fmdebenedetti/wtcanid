@@ -1,38 +1,9 @@
 // Utilidades para 2FA
 import Logger from './logger';
+import jwt from "jsonwebtoken";
+import { TwoFACode, Validate2FAResult, JWTPayload, AccountResponse } from './types';
 
-/*
-// EJEMPLO de integración con Redis para almacenar códigos 2FA
-dejar comentado para referencia futura
-import Redis from 'ioredis';
-const redis = new Redis();
-
-export async function save2FACodeToRedis(accountId: string, code: string, expiresInMs: number) {
-  await redis.set(`2fa:${accountId}`, code, 'PX', expiresInMs);
-}
-
-export async function get2FACodeFromRedis(accountId: string): Promise<string | null> {
-  return await redis.get(`2fa:${accountId}`);
-}
-
-export async function delete2FACodeFromRedis(accountId: string) {
-  await redis.del(`2fa:${accountId}`);
-}
-// Fin ejemplo Redis
-*/
-
-export interface TwoFACode {
-  code: string;
-  accountId: string;
-  expiresAt: number;
-  attempts: number;
-}
-
-export interface Validate2FAResult {
-  status: "valid" | "expired" | "invalid";
-  attempts?: number;
-  message?: string;
-}
+const JWT_SECRET = process.env.JWT_SECRET || 'B7wNrW1gfJ9pLvtkGYirtGJQrLNt6zbA';
 
 const MAX_ATTEMPTS = 3;
 const EXPIRATION_TIME = 60 * 1000;
@@ -109,4 +80,26 @@ export function validate2FACode(accountId: string, code: string): Validate2FARes
   }
 
   return { status: "valid", message: "Código válido" };
+}
+
+export async function generateJwtToken(account: AccountResponse): Promise<string> {
+  Logger.info(`Generando JWT para cuenta: ${account.id}`);
+
+  if (!account) {
+    throw new Error('Cuenta inactiva');
+  }
+
+  const payload: JWTPayload = {
+    sub: account.id,
+    email: account.email,
+    firstName: account.firstName,
+    lastName: account.lastName
+  };
+
+  try {
+    return jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' });
+  } catch (error) {
+    Logger.error(`Error generando JWT: ${error}`);
+    throw error;
+  }
 }
